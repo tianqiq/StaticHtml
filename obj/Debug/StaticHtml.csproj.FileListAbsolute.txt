@@ -1,5 +1,0 @@
-C:\Users\Administrator\Desktop\StaticHtml\StaticHtml\bin\Debug\StaticHtml.dll
-C:\Users\Administrator\Desktop\StaticHtml\StaticHtml\bin\Debug\StaticHtml.pdb
-C:\Users\Administrator\Desktop\StaticHtml\StaticHtml\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\Administrator\Desktop\StaticHtml\StaticHtml\obj\Debug\StaticHtml.dll
-C:\Users\Administrator\Desktop\StaticHtml\StaticHtml\obj\Debug\StaticHtml.pdb
