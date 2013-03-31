@@ -1,0 +1,8 @@
+<publishData>
+  <publishTarget publishUrl="C:\Users\Administrator\Desktop\testasp.net\">
+    <file relUrl="bin/StaticHtml.dll" publishTime="03/07/2013 21:04:53" />
+    <file relUrl="Default.aspx" publishTime="03/06/2013 19:19:26" />
+    <file relUrl="bin/StaticHtml.pdb" publishTime="03/07/2013 21:04:53" />
+    <file relUrl="Web.config" publishTime="03/07/2013 21:08:11" />
+  </publishTarget>
+</publishData>
