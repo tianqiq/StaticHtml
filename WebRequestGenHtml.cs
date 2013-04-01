@@ -17,7 +17,9 @@ namespace StaticHtml
 
         public string GenHTML(HttpRequest req)
         {
-            var request = (HttpWebRequest)WebRequest.Create(req.Url.ToString() + '?' + HtmlStaticCore.SKIPMARK);
+            var url = req.Url.ToString();
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Headers.Add(HtmlStaticCore.SKIPMARKHEAD, "1");
             request.CookieContainer = new CookieContainer();
             foreach (System.Web.HttpCookie item in req.Cookies)
             {

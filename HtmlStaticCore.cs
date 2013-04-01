@@ -19,7 +19,7 @@ namespace StaticHtml
         /// <summary>
         /// 系统定义的不进行Html缓存的Url标识
         /// </summary>
-        public const String SKIPMARK = "__static_html__skip_mark__";
+        public const String SKIPMARKHEAD = "staticHtml";
 
         /// <summary>
         /// 直接跳过的Url正则表达式
@@ -38,7 +38,7 @@ namespace StaticHtml
             {
                 skip = skipRegex.IsMatch(req.RawUrl);
             }
-            return req.RawUrl.Contains(SKIPMARK) || skip;
+            return req.Headers[HtmlStaticCore.SKIPMARKHEAD] == "1" || skip;
         }
 
         /// <summary>
@@ -76,9 +76,9 @@ namespace StaticHtml
         {
             var splits = type.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
             object ret = null;
-            if (splits.Length == 1)
+            if (splits.Length == 2)
             {
-                ret = Activator.CreateInstance(splits[0], splits[1]).Unwrap();
+                ret = Activator.CreateInstance(splits[1], splits[0]).Unwrap();
             }
             else if (splits.Length == 1)
             {

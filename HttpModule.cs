@@ -61,7 +61,6 @@ namespace StaticHtml
             {
                 if (!core.IsSkip(httpApplication.Context.Request))
                 {
-                    //Log("a request patten! url:" + httpApplication.Context.Request.RawUrl);
                     core.Process(httpApplication.Context);
                 }
             }
