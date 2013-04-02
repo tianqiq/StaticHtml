@@ -17,7 +17,7 @@ namespace StaticHtml
         public IList<Rule> rules { get; set; }
 
         /// <summary>
-        /// 系统定义的不进行Html缓存的Url标识
+        /// 系统定义的不进行Html缓存的Http头标识
         /// </summary>
         public const String SKIPMARKHEAD = "staticHtml";
 
@@ -45,17 +45,30 @@ namespace StaticHtml
         /// 根据配置文件，初始化HtmlStaticCore
         /// </summary>
         /// <param name="config"></param>
-        public HtmlStaticCore(StaticHtmlSection config)
+        private HtmlStaticCore(StaticHtmlSection config)
         {
+            String RegexSkip = @"\.(jpg)|(ico)|(js)|(png)|(jpeg)|(bmp)|(css)|(xml)|(html)|(htm)|(xml)|(swf)|(flv)|(pdf)|(txt)";
             if (!String.IsNullOrEmpty(config.Skip))
             {
-                skipRegex = new Regex(config.Skip, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+                RegexSkip = config.Skip;
             }
+            skipRegex = new Regex(RegexSkip, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             rules = new List<Rule>();
             foreach (RuleElement rule in config.Rules)
             {
                 rules.Add(ToRule(rule));
             }
+        }
+
+        private static HtmlStaticCore instance;
+
+        public static HtmlStaticCore GetInstance(StaticHtmlSection config)
+        {
+            if (instance == null)
+            {
+                instance = new HtmlStaticCore(config);
+            }
+            return instance;
         }
 
         #region 根据配置文件信息，初始化HtmlStaticCore

@@ -23,7 +23,7 @@ namespace StaticHtml
             CreateCacheDir(_path);
         }
 
-        private String _path="~/cacheHtml/";
+        private String _path = "~/cacheHtml/";
 
         /// <summary>
         /// 相对于站点根目录的缓存目录
@@ -56,7 +56,11 @@ namespace StaticHtml
         public void Save(string key, string html)
         {
             GetRealPath();
-            File.WriteAllText(innerpath + key, html);
+            using (var write = File.CreateText(innerpath + key))
+            {
+                write.Write(html);
+            }
+            //File.WriteAllText(innerpath + key, html);
         }
 
         /// <summary>

@@ -21,11 +21,12 @@ namespace StaticHtml
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Headers.Add(HtmlStaticCore.SKIPMARKHEAD, "1");
             request.CookieContainer = new CookieContainer();
-            foreach (System.Web.HttpCookie item in req.Cookies)
+            for (var i = 0; i < req.Cookies.Count; i++)
             {
-                var cookie = new Cookie(item.Name, item.Value, item.Path, item.Domain);
+                System.Web.HttpCookie item = req.Cookies[i];
+                var cookie = new Cookie(item.Name, item.Value, item.Path);
                 cookie.Expires = item.Expires;
-                request.CookieContainer.Add(cookie);
+                request.CookieContainer.Add(req.Url,cookie);
             }
             using (StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream()))
             {

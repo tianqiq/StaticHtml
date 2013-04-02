@@ -52,10 +52,16 @@ namespace StaticHtml
             return Patten.IsPatten(request);
         }
 
+
         /// <summary>
         /// 强制刷新缓存标识
         /// </summary>
         public const String REFRESH = "__forced__refresh__";
+
+        /// <summary>
+        /// 全局信息，标识该Request/key 是否正在生成html
+        /// </summary>
+        HashSet<string> GlobalGenHtmlState = new HashSet<string>();
 
         /// <summary>
         /// 应用该规则
@@ -68,12 +74,17 @@ namespace StaticHtml
             var info = Store.Query(key);
             if (req.RawUrl.Contains(REFRESH) || Expire.IsExpire(req, info))
             {
-                var html = GenHTML.GenHTML(context.Request);
-                if (html != null)
+                if (!GlobalGenHtmlState.Contains(key))
                 {
-                    context.Response.Write(html);
-                    Store.Save(key, html);
-                    context.ApplicationInstance.CompleteRequest();
+                    GlobalGenHtmlState.Add(key);
+                    var html = GenHTML.GenHTML(context.Request);
+                    if (html != null)
+                    {
+                        context.Response.Write(html);
+                        Store.Save(key, html);
+                        context.ApplicationInstance.CompleteRequest();
+                    }
+                    GlobalGenHtmlState.Remove(key);
                 }
             }
             else

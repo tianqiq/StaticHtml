@@ -31,7 +31,10 @@ namespace StaticHtml
         /// <param name="info"></param>
         private void Log(string info)
         {
-            System.IO.File.AppendAllText(Getpath(), DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "  " + info + "\n");
+            lock (this)
+            {
+                System.IO.File.AppendAllText(Getpath(), DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "  " + info + "\n");
+            }
         }
 
         public void Dispose()
@@ -44,7 +47,7 @@ namespace StaticHtml
         {
             try
             {
-                core = new HtmlStaticCore(System.Configuration.ConfigurationManager.GetSection("staticHtml") as StaticHtmlSection);
+                core = HtmlStaticCore.GetInstance(System.Configuration.ConfigurationManager.GetSection("staticHtml") as StaticHtmlSection);
                 context.BeginRequest += new EventHandler(context_BeginRequest);
                 Log("ini:success!");
             }

@@ -21,6 +21,8 @@ namespace StaticHtml
         /// <returns>内容</returns>
         String Get(String key);
         
+
+
         /// <summary>
         /// 查询缓存信息
         /// </summary>
