@@ -27,18 +27,29 @@ namespace StaticHtml
         private Regex skipRegex;
 
         /// <summary>
+        /// 系统默认跳过静态文件
+        /// </summary>
+        const String staticSkip = @"\.(jpg)|(gif)|(ico)|(js)|(png)|(jpeg)|(bmp)|(css)|(xml)|(html)|(htm)|(xml)|(swf)|(flv)|(pdf)|(txt)$";
+        private Regex systemSkip = new Regex(staticSkip, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        /// <summary>
         /// 判断是否调过
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
         public Boolean IsSkip(HttpRequest req)
         {
+            //跳过非get请求
+            if (req.HttpMethod != System.Net.WebRequestMethods.Http.Get)
+            {
+                return false;
+            }
             var skip = false;
             if (skipRegex != null)
             {
                 skip = skipRegex.IsMatch(req.RawUrl);
             }
-            return req.Headers[HtmlStaticCore.SKIPMARKHEAD] == "1" || skip;
+            return skip || systemSkip.IsMatch(req.RawUrl) || req.Headers[HtmlStaticCore.SKIPMARKHEAD] == "1";
         }
 
         /// <summary>
@@ -47,12 +58,10 @@ namespace StaticHtml
         /// <param name="config"></param>
         private HtmlStaticCore(StaticHtmlSection config)
         {
-            String RegexSkip = @"\.(jpg)|(ico)|(js)|(png)|(jpeg)|(bmp)|(css)|(xml)|(html)|(htm)|(xml)|(swf)|(flv)|(pdf)|(txt)";
             if (!String.IsNullOrEmpty(config.Skip))
             {
-                RegexSkip = config.Skip;
+                skipRegex = new Regex(config.Skip, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             }
-            skipRegex = new Regex(RegexSkip, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             rules = new List<Rule>();
             foreach (RuleElement rule in config.Rules)
             {
