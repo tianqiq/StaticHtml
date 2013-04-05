@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Diagnostics;
 namespace StaticHtml
 {
     /// <summary>
@@ -74,25 +75,71 @@ namespace StaticHtml
             var info = Store.Query(key);
             if (req.RawUrl.Contains(REFRESH) || Expire.IsExpire(req, info))
             {
-                if (!GlobalGenHtmlState.Contains(key))
-                {
-                    GlobalGenHtmlState.Add(key);
-                    var html = GenHTML.GenHTML(context.Request);
-                    if (html != null)
-                    {
-                        context.Response.Write(html);
-                        Store.Save(key, html);
-                        context.ApplicationInstance.CompleteRequest();
-                    }
-                    GlobalGenHtmlState.Remove(key);
-                }
+                GenHtmlAndSave(context, key, info);
             }
             else
             {
-                context.Response.Write(Store.Get(key));
-                context.ApplicationInstance.CompleteRequest();
+                ResponceCache(context, key, info);
             }
+        }
 
+        /// <summary>
+        /// 缓存没过期，直接输出缓存
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="key"></param>
+        /// <param name="info"></param>
+        private void ResponceCache(HttpContext context, string key, HtmlInfo info)
+        {
+            var req = context.Request;
+            var rep = context.Response;
+            string time = info.StoreTime.ToString("yyyy-MM-dd HH:mm:ss");
+            rep.AppendHeader("Last-Modified", time);
+            if (req.Headers["If-Modified-Since"] == time)
+            {
+                rep.StatusCode = (int)System.Net.HttpStatusCode.NotModified;
+            }
+            else
+            {
+                rep.Write(Store.Get(key));
+            }
+            context.ApplicationInstance.CompleteRequest();
+        }
+
+        /// <summary>
+        /// 生成缓存保存，并输出
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="key"></param>
+        /// <param name="info"></param>
+        private void GenHtmlAndSave(HttpContext context, string key, HtmlInfo info)
+        {
+            var req = context.Request;
+            var rep = context.Response;
+            if (!GlobalGenHtmlState.Contains(key))
+            {
+                try
+                {
+                    GlobalGenHtmlState.Add(key);
+                    var html = GenHTML.GenHTML(req);
+                    if (html != null)
+                    {
+                        Store.Save(key, html);
+                        DateTime lastModifyed = info != null ? info.StoreTime : Store.Query(key).StoreTime;
+                        rep.AppendHeader("Last-Modified", lastModifyed.ToString("yyyy-MM-dd HH:mm:ss"));
+                        rep.Write(html);
+                        context.ApplicationInstance.CompleteRequest();
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    GlobalGenHtmlState.Remove(key);
+                }
+            }
         }
 
     }
