@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Xml.Linq;
+using System.Diagnostics;
 
 namespace StaticHtml
 {
@@ -13,29 +14,6 @@ namespace StaticHtml
     public class HttpModule : IHttpModule
     {
         #region IHttpModule 成员
-
-        private string log_path = null;
-
-        private string Getpath()
-        {
-            if (log_path == null)
-            {
-                log_path = HttpContext.Current.Server.MapPath("~/") + "log.txt";
-            }
-            return log_path;
-        }
-
-        /// <summary>
-        /// 日志记录
-        /// </summary>
-        /// <param name="info"></param>
-        private void Log(string info)
-        {
-            lock (this)
-            {
-                System.IO.File.AppendAllText(Getpath(), DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "  " + info + "\n");
-            }
-        }
 
         public void Dispose()
         {
@@ -49,11 +27,11 @@ namespace StaticHtml
             {
                 core = HtmlStaticCore.GetInstance(System.Configuration.ConfigurationManager.GetSection("staticHtml") as StaticHtmlSection);
                 context.BeginRequest += new EventHandler(context_BeginRequest);
-                Log("ini:success!");
+                LogHelp.Write("int success! ");
             }
             catch (Exception e)
             {
-                Log("ini:error!  " + e.ToString());
+                LogHelp.Error("ini error! " + e.ToString());
             }
         }
 
@@ -69,7 +47,7 @@ namespace StaticHtml
             }
             catch (Exception ex)
             {
-                Log("process:error!  " + httpApplication.Request.RawUrl + "  " + ex.ToString());
+                LogHelp.Warn("request process error " + httpApplication.Request.RawUrl + " " + ex.ToString());
             }
         }
 

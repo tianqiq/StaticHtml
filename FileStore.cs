@@ -20,10 +20,10 @@ namespace StaticHtml
 
         public FileStore()
         {
-            CreateCacheDir(_path);
+            // CreateCacheDir(_path);
         }
 
-        private String _path = "~/cacheHtml/";
+        private String _path = "cacheHtml/";
 
         /// <summary>
         /// 相对于站点根目录的缓存目录
@@ -31,7 +31,7 @@ namespace StaticHtml
         public String Path
         {
             get { return _path; }
-            set { _path = value; CreateCacheDir(_path); }
+            set { _path = value; }
         }
 
         /// <summary>
@@ -40,13 +40,25 @@ namespace StaticHtml
         /// <param name="dir"></param>
         private void CreateCacheDir(string dir)
         {
-            innerpath = HttpContext.Current.Server.MapPath(dir);
-            DirectoryInfo dirInfo = new DirectoryInfo(innerpath);
+            DirectoryInfo dirInfo = new DirectoryInfo(dir);
             if (!dirInfo.Exists)
             {
                 dirInfo.Create();
             }
         }
+
+        /// <summary>
+        /// 获取真实路径
+        /// </summary>
+        private void GetRealPath()
+        {
+            if (innerpath == null)
+            {
+                innerpath = HttpRuntime.AppDomainAppPath + Path;
+                CreateCacheDir(innerpath);
+            }
+        }
+
 
         /// <summary>
         /// 保存缓存文件
@@ -59,18 +71,6 @@ namespace StaticHtml
             using (var write = File.CreateText(innerpath + key))
             {
                 write.Write(html);
-            }
-            //File.WriteAllText(innerpath + key, html);
-        }
-
-        /// <summary>
-        /// 获取真实路径
-        /// </summary>
-        private void GetRealPath()
-        {
-            if (innerpath == null)
-            {
-                innerpath = HttpContext.Current.Server.MapPath(Path);
             }
         }
 

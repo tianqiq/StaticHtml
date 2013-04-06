@@ -78,6 +78,7 @@
     <Compile Include="IGenKey.cs" />
     <Compile Include="IPatten.cs" />
     <Compile Include="IStore.cs" />
+    <Compile Include="LogHelp.cs" />
     <Compile Include="MemStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegexPatten.cs" />
