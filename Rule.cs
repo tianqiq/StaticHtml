@@ -98,10 +98,12 @@ namespace StaticHtml
             if (req.Headers["If-Modified-Since"] == time)
             {
                 rep.StatusCode = (int)System.Net.HttpStatusCode.NotModified;
+                LogHelp.Info("cache hit 304 " + req.RawUrl);
             }
             else
             {
                 rep.Write(Store.Get(key));
+                LogHelp.Info("cache hit html " + req.RawUrl);
             }
             context.ApplicationInstance.CompleteRequest();
         }
@@ -129,7 +131,13 @@ namespace StaticHtml
                         rep.AppendHeader("Last-Modified", lastModifyed.ToString("yyyy-MM-dd HH:mm:ss"));
                         rep.Write(html);
                         context.ApplicationInstance.CompleteRequest();
+                        LogHelp.Info("genHtml response success " + req.RawUrl);
                     }
+                    else
+                    {
+                        LogHelp.Info("getHtml is null " + req.RawUrl);
+                    }
+
                 }
                 catch (Exception e)
                 {
