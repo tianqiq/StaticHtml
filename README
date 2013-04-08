@@ -1,6 +1,6 @@
   StaticHtml 
-  是一个简单，易扩展，高效的asp.net 静态html生成组建, 由纯asp.net编写，可以在不改变网站任何源代码
-  的情况下，为网站添加html静态缓存。 只需要在web.config配置即可。 兼容urlrewrite的网站
+  是一个简单，易扩展，高效的asp.net 静态html生成组建, 由纯asp.net编写，可以在不改变网站任何
+  源代码的情况下，为网站添加html静态缓存。 只需要在web.config配置即可。 兼容urlrewrite的网站
   怎么使用？ 请下载 StaticHtml使用教程.docx 里面有详细介绍。
   
 
