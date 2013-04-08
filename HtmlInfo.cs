@@ -24,7 +24,7 @@ namespace StaticHtml
          /// <summary>
         /// key
         /// </summary>
-        public String Key{get;set;}
+        public String Key{ get; set; }
 
     }
 }
