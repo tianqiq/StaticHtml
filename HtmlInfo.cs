@@ -20,6 +20,11 @@ namespace StaticHtml
         /// 大小
         /// </summary>
         public long Size { get; set; }
+        
+         /// <summary>
+        /// key
+        /// </summary>
+        public String Key{get;set;}
 
     }
 }
