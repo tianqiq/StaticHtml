@@ -29,7 +29,7 @@ namespace StaticHtml
         /// <summary>
         /// 系统默认跳过静态文件
         /// </summary>
-        const String staticSkip = @"\.(jpg)|(gif)|(ico)|(js)|(png)|(jpeg)|(bmp)|(css)|(xml)|(html)|(htm)|(xml)|(swf)|(flv)|(pdf)|(txt)$";
+        const String staticSkip = @"\.(jpg)|(gif)|(ico)|(js)|(png)|(jpeg)|(bmp)|(css)|(rar)|(swf)|(tar)|(zip)|(flv)|(pdf)|(txt)$";
         private Regex systemSkip = new Regex(staticSkip, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
