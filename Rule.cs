@@ -73,6 +73,10 @@ namespace StaticHtml
             var req = context.Request;
             var key = GenKey.GenKey(req);
             var info = Store.Query(key);
+            if(info != null)
+            {
+                info.Key = key;
+            }
             if (req.RawUrl.Contains(REFRESH) || Expire.IsExpire(req, info))
             {
                 GenHtmlAndSave(context, key, info);
