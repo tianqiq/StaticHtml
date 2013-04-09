@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // 有关程序集的常规信息通过下列属性集
 // 控制。更改这些属性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("StaticHtml")]
+[assembly: AssemblyTitle("StaticHtml 简单，易扩展的asp.net页面静态化生成组件")]
 [assembly: AssemblyDescription("一个简单，易扩展的asp.net页面静态化生成组件")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyConfiguration("tianqiq")]
 [assembly: AssemblyCompany("tianqiq")]
-[assembly: AssemblyProduct("StaticHtml")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyProduct("StaticHtml.net")]
+[assembly: AssemblyCopyright("Copyright © tianqiq 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
