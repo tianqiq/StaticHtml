@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 // 控制。更改这些属性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("StaticHtml")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("一个简单，易扩展的asp.net页面静态化生成组件")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("tianqiq")]
 [assembly: AssemblyProduct("StaticHtml")]
 [assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
