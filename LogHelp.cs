@@ -21,7 +21,7 @@ namespace StaticHtml
 
         public static void Write(string message)
         {
-            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") +" : "+ message);
+            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") +": "+ message);
         }
 
         public static void Info(string message)
