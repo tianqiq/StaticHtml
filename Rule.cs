@@ -97,7 +97,7 @@ namespace StaticHtml
         {
             var req = context.Request;
             var rep = context.Response;
-            string time = info.StoreTime.ToString("yyyy-MM-dd HH:mm:ss");
+            string time = info.StoreTime.ToString("r");
             rep.AppendHeader("Last-Modified", time);
             if (req.Headers["If-Modified-Since"] == time)
             {
@@ -132,7 +132,7 @@ namespace StaticHtml
                     {
                         Store.Save(key, html);
                         DateTime lastModifyed = info != null ? info.StoreTime : Store.Query(key).StoreTime;
-                        rep.AppendHeader("Last-Modified", lastModifyed.ToString("yyyy-MM-dd HH:mm:ss"));
+                        rep.AppendHeader("Last-Modified", lastModifyed.ToString("r"));
                         rep.Write(html);
                         context.ApplicationInstance.CompleteRequest();
                         LogHelp.Info("genHtml response success " + req.RawUrl);
