@@ -3,6 +3,7 @@ using System.Data;
 using System.Configuration;
 using System.Linq;
 using System.Collections.Generic;
+using System.IO;
 
 namespace StaticHtml
 {
@@ -13,40 +14,44 @@ namespace StaticHtml
     {
         #region IStore 成员
 
-        private IDictionary<string, string> Cache = new Dictionary<string, string>();
-        private IDictionary<string, HtmlInfo> infos = new Dictionary<string, HtmlInfo>();
-        public void Save(string key, string html)
+        private IDictionary<string, Stream> Cache = new Dictionary<string, Stream>();
+        private IDictionary<string, CacheInfo> infos = new Dictionary<string, CacheInfo>();
+        public void Save(string key, Stream repInfo)
         {
-            Cache[key] = html;
-            HtmlInfo info = null;
+            Cache[key] = repInfo;
+            CacheInfo info = null;
             if (infos.ContainsKey(key))
             {
                 info = infos[key];
             }
             else
             {
-                info = new HtmlInfo();
+                info = new CacheInfo();
             }
-            info.Size = html.Length;
+            info.Size = repInfo.Length;
             info.StoreTime = DateTime.Now;
             infos[key] = info;
         }
 
-        public string Get(String key)
+        public Stream Get(String key)
         {
+            Stream ret = null;
             if (Cache.ContainsKey(key))
             {
-                return Cache[key];
+                ret = new MemoryStream((Cache[key] as MemoryStream).ToArray()); ;
+                ret.Position = 0;
             }
-            return null;
+
+            return ret;
         }
 
 
-        public HtmlInfo Query(string key)
+        public CacheInfo Query(string key)
         {
-            HtmlInfo info = null;
+            CacheInfo info = null;
             if (infos.ContainsKey(key))
             {
+
                 info = infos[key];
             }
             return info;

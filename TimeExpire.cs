@@ -29,7 +29,7 @@ namespace StaticHtml
             }
         }
 
-        public bool IsExpire(HttpRequest req, HtmlInfo info)
+        public bool IsExpire(HttpRequest req, CacheInfo info)
         {
             return info == null || (DateTime.Now - info.StoreTime).TotalSeconds > _second;
         }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Net;
 using System.Web;
 using System.Net.Sockets;
+using System.IO.Compression;
 
 namespace StaticHtml
 {
@@ -19,94 +20,44 @@ namespace StaticHtml
         const String CONNECTION_CLOSE = "Connection: close\r\n";
         const String HEADERFORMAT = "{0}: {1}\r\n";
 
-        public string GenHTML(HttpRequest req)
+        public Stream GenHTML(HttpRequest req)
         {
             using (var client = new TcpClient())
             {
                 client.Connect(req.Url.Host, req.Url.Port);
                 using (var stream = client.GetStream())
                 {
-                    var _out = new StreamWriter(stream);
-                    var _in = new StreamReader(stream);
-                    _out.Write(String.Format("{0} {1} {2}\r\n", req.HttpMethod, req.RawUrl, req.ServerVariables["SERVER_PROTOCOL"]));
-                    _out.Write(String.Format(HEADERFORMAT, "HOST", req.Url.Authority));
-                    _out.Write(String.Format(HEADERFORMAT, HtmlStaticCore.SKIPMARKHEAD, 1));
-                    foreach (String key in req.Headers.Keys)
-                    {
-                        var lowerKey = key.ToLower();
-                        if (lowerKey != "connection" && lowerKey != "host")
-                        {
-                            var val = req.Headers[key];
-                            _out.Write(String.Format(HEADERFORMAT, key, val));
-                        }
-                    }
-                    _out.Write(CONNECTION_CLOSE);
-                    _out.Write("\r\n");
-                    _out.Flush();
-                    SkipHeader(_in.BaseStream);
-                    return _in.ReadToEnd();
+                    OutHeader(req, stream);
+                    return HttpParseHelp.ToGzip(stream);
                 }
             }
 
         }
 
+        
         /// <summary>
-        /// 跳过响应Http头信息
+        /// 发送所有请求头到服务器
         /// </summary>
-        /// <param name="_in"></param>
-        private void SkipHeader(Stream _in)
+        /// <param name="req"></param>
+        /// <param name="_stream"></param>
+        private void OutHeader(HttpRequest req, Stream _stream)
         {
-            var buff = new byte[4];
-            int len = 4;
-            int state = 1;
-            while (true)
+            var _out = new StreamWriter(_stream);
+            _out.Write(String.Format("{0} {1} {2}\r\n", req.HttpMethod, req.RawUrl, req.ServerVariables["SERVER_PROTOCOL"]));
+            _out.Write(String.Format(HEADERFORMAT, "HOST", req.Url.Authority));
+            _out.Write(String.Format(HEADERFORMAT, HtmlStaticCore.SKIPMARKHEAD, 1));
+            foreach (String key in req.Headers.Keys)
             {
-                _in.Read(buff, 0, len);
-                for (int i = 0; i < len; i++)
+                var lowerKey = key.ToLower();
+                if (lowerKey != "connection" && lowerKey != "host")
                 {
-                    var one = buff[i];
-                    switch (state)
-                    {
-                        case 1:
-                            {
-                                if (one == '\r')
-                                {
-                                    state = 2;
-                                }
-                                else { state = 1; }
-                                break;
-                            }
-                        case 2:
-                            {
-                                if (one == '\n')
-                                {
-                                    state = 3;
-                                }
-                                else { state = 1; }
-                                break;
-                            }
-                        case 3:
-                            {
-                                if (one == '\r')
-                                {
-                                    state = 4;
-                                }
-                                else { state = 1; }
-                                break;
-                            }
-                        case 4:
-                            {
-                                if (one == '\n')
-                                {
-                                    return;
-                                }
-                                else { state = 1; }
-                                break;
-                            }
-                    }
+                    var val = req.Headers[key];
+                    _out.Write(String.Format(HEADERFORMAT, key, val));
                 }
-                len = 5 - state;
             }
+            _out.Write(CONNECTION_CLOSE);
+            _out.Write("\r\n");
+            _out.Flush();
         }
 
         /* asp.net bug。当cookie value里面有逗号会出错

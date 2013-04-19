@@ -13,7 +13,6 @@ namespace StaticHtml
     /// </summary>
     public class FileStore : IStore
     {
-
         #region IStore 成员
 
         private String innerpath;
@@ -65,12 +64,13 @@ namespace StaticHtml
         /// </summary>
         /// <param name="key">HttpRequest唯一key</param>
         /// <param name="html">html内容</param>
-        public void Save(string key, string html)
+        public void Save(string key, Stream repInfo)
         {
             GetRealPath();
-            using (var write = File.CreateText(innerpath + key))
+            using (var write = File.Create(innerpath + key))
             {
-                write.Write(html);
+                var stream = repInfo as MemoryStream;
+                write.Write(stream.ToArray(), 0, (int)stream.Length);
             }
         }
 
@@ -79,10 +79,10 @@ namespace StaticHtml
         /// </summary>
         /// <param name="key">HttpRequest唯一key</param>
         /// <returns>Html内容</returns>
-        public string Get(string key)
+        public Stream Get(string key)
         {
             GetRealPath();
-            return File.ReadAllText(innerpath + key);
+            return File.OpenRead(innerpath + key);
         }
 
         /// <summary>
@@ -90,13 +90,13 @@ namespace StaticHtml
         /// </summary>
         /// <param name="key">HttpRequest唯一key</param>
         /// <returns>Html</returns>
-        public HtmlInfo Query(string key)
+        public CacheInfo Query(string key)
         {
             GetRealPath();
             FileInfo fileinfo = new FileInfo((innerpath + key));
             if (fileinfo.Exists)
             {
-                var info = new HtmlInfo();
+                var info = new CacheInfo();
                 info.StoreTime = fileinfo.LastWriteTime;
                 info.Size = fileinfo.Length;
                 return info;

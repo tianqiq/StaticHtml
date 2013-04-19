@@ -14,11 +14,11 @@ namespace StaticHtml
     {
         #region IGenHtml 成员
 
-        public string GenHTML(HttpRequest req)
+        public Stream GenHTML(HttpRequest req)
         {
             var writer = new StringWriter();
             HttpContext.Current.Server.Execute(req.RawUrl, writer, true);
-            return writer.ToString();
+            return new MemoryStream();
         }
 
         #endregion

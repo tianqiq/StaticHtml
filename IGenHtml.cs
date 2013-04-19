@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web;
 using System.ComponentModel;
+using System.IO;
 
 namespace StaticHtml
 {
@@ -14,6 +15,6 @@ namespace StaticHtml
         /// </summary>
         /// <param name="req">HttpRequest请求</param>
         /// <returns>Html内容</returns>
-        string GenHTML(HttpRequest req);
+        Stream GenHTML(HttpRequest req);
     }
 }

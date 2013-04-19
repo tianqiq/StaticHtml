@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace StaticHtml
 {
@@ -12,14 +13,14 @@ namespace StaticHtml
         /// </summary>
         /// <param name="key">HttpRequest生成的key</param>
         /// <param name="html">内容</param>
-        void Save(String key,string html);
+        void Save(String key, Stream repInfo);
        
         /// <summary>
         /// 获取缓存的Html
         /// </summary>
         /// <param name="key">HttpRequest生成的key</param>
         /// <returns>内容</returns>
-        String Get(String key);
+        Stream Get(String key);
         
 
 
@@ -28,6 +29,6 @@ namespace StaticHtml
         /// </summary>
         /// <param name="key">HttpRequest生成的key</param>
         /// <returns>HtmlInfo包含存储时间，大小等</returns>
-        HtmlInfo Query(String key);
+        CacheInfo Query(String key);
     }
 }

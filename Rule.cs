@@ -6,6 +6,8 @@ using System.Web;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 namespace StaticHtml
 {
     /// <summary>
@@ -73,7 +75,7 @@ namespace StaticHtml
             var req = context.Request;
             var key = GenKey.GenKey(req);
             var info = Store.Query(key);
-            if(info != null)
+            if (info != null)
             {
                 info.Key = key;
             }
@@ -88,12 +90,44 @@ namespace StaticHtml
         }
 
         /// <summary>
+        /// 容许缓存并且转发的各个客户的http头
+        /// </summary>
+        HashSet<string> alowHeader = new HashSet<string>() { "Content-Type", "Vary" };
+
+        /// <summary>
+        /// 输出Http流
+        /// </summary>
+        /// <param name="rep"></param>
+        /// <param name="info"></param>
+        private void OutResponse(HttpResponse rep, HttpInfo info)
+        {
+            rep.AppendHeader("Content-Encoding", "gzip");
+            foreach (var item in info.Headers)
+            {
+                if (alowHeader.Contains(item.Name))
+                {
+                    rep.AppendHeader(item.Name, item.Value.TrimEnd());
+                }
+            }
+            var buff = new byte[2048];
+            var len = 0;
+            using (info.Content)
+            {
+                while ((len = info.Content.Read(buff, 0, 2048)) != 0)
+                {
+                    rep.OutputStream.Write(buff, 0, len);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// 缓存没过期，直接输出缓存
         /// </summary>
         /// <param name="context"></param>
         /// <param name="key"></param>
         /// <param name="info"></param>
-        private void ResponceCache(HttpContext context, string key, HtmlInfo info)
+        private void ResponceCache(HttpContext context, string key, CacheInfo info)
         {
             var req = context.Request;
             var rep = context.Response;
@@ -106,19 +140,24 @@ namespace StaticHtml
             }
             else
             {
-                rep.Write(Store.Get(key));
+                var httpInfo = new HttpInfo();
+                var _stream = Store.Get(key);
+                int headEndPosition = 0;
+                httpInfo.Headers = HttpParseHelp.ParseHeader(_stream, ref headEndPosition);
+                httpInfo.Content = _stream;
+                OutResponse(rep, httpInfo);
                 LogHelp.Info("cache hit html " + req.RawUrl);
             }
             context.ApplicationInstance.CompleteRequest();
         }
- 
+
         /// <summary>
         /// 生成缓存保存，并输出
         /// </summary>
         /// <param name="context"></param>
         /// <param name="key"></param>
         /// <param name="info"></param>
-        private void GenHtmlAndSave(HttpContext context, string key, HtmlInfo info)
+        private void GenHtmlAndSave(HttpContext context, string key, CacheInfo info)
         {
             var req = context.Request;
             var rep = context.Response;
@@ -130,10 +169,11 @@ namespace StaticHtml
                     var html = GenHTML.GenHTML(req);
                     if (html != null)
                     {
+                        var httpInfo = HttpParseHelp.Parse(html);
                         Store.Save(key, html);
                         DateTime lastModifyed = info != null ? info.StoreTime : Store.Query(key).StoreTime;
                         rep.AppendHeader("Last-Modified", lastModifyed.ToString("r"));
-                        rep.Write(html);
+                        OutResponse(rep, httpInfo);
                         context.ApplicationInstance.CompleteRequest();
                         LogHelp.Info("genHtml response success " + req.RawUrl);
                     }
