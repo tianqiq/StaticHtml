@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.IO;
 using System.Security;
+using System.Collections.Generic;
 
 namespace StaticHtml
 {
@@ -58,6 +59,19 @@ namespace StaticHtml
             }
         }
 
+        private HashSet<string> CreatedDir = new HashSet<string>();
+
+        private string GetPath(string key)
+        {
+            var dir = key.Substring(0, 2);
+            string path = innerpath + '/' + dir + '/';
+            if (!CreatedDir.Contains(dir))
+            {
+                CreateCacheDir(path);
+                CreatedDir.Add(dir);
+            }
+            return path + key;
+        }
 
         /// <summary>
         /// 保存缓存文件
@@ -66,8 +80,7 @@ namespace StaticHtml
         /// <param name="html">html内容</param>
         public void Save(string key, Stream repInfo)
         {
-            GetRealPath();
-            using (var write = File.Create(innerpath + key))
+            using (var write = File.Create(GetPath(key)))
             {
                 var stream = repInfo as MemoryStream;
                 write.Write(stream.ToArray(), 0, (int)stream.Length);
@@ -82,7 +95,7 @@ namespace StaticHtml
         public Stream Get(string key)
         {
             GetRealPath();
-            return File.OpenRead(innerpath + key);
+            return File.OpenRead(GetPath(key));
         }
 
         /// <summary>
@@ -93,7 +106,7 @@ namespace StaticHtml
         public CacheInfo Query(string key)
         {
             GetRealPath();
-            FileInfo fileinfo = new FileInfo((innerpath + key));
+            FileInfo fileinfo = new FileInfo(GetPath(key));
             if (fileinfo.Exists)
             {
                 var info = new CacheInfo();

@@ -20,12 +20,14 @@ namespace StaticHtml
 
         }
 
+        private readonly static StaticHtmlSection htmlSection = System.Configuration.ConfigurationManager.GetSection("staticHtml") as StaticHtmlSection;
+
         HtmlStaticCore core;
         public void Init(HttpApplication context)
         {
             try
             {
-                core = HtmlStaticCore.GetInstance(System.Configuration.ConfigurationManager.GetSection("staticHtml") as StaticHtmlSection);
+                core = HtmlStaticCore.GetInstance(htmlSection);
                 context.BeginRequest += new EventHandler(context_BeginRequest);
                 LogHelp.Write("int success! ");
             }

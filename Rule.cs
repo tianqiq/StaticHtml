@@ -60,6 +60,7 @@ namespace StaticHtml
         /// 强制刷新缓存标识
         /// </summary>
         public const String REFRESH = "__forced__refresh__";
+        public const String REFRESHHEADER = "forced__refresh";
 
         /// <summary>
         /// 全局信息，标识该Request/key 是否正在生成html
@@ -79,7 +80,7 @@ namespace StaticHtml
             {
                 info.Key = key;
             }
-            if (req.RawUrl.Contains(REFRESH) || Expire.IsExpire(req, info))
+            if (req.RawUrl.Contains(REFRESH) || req.Headers[REFRESHHEADER] == "1" || Expire.IsExpire(req, info))
             {
                 GenHtmlAndSave(context, key, info);
             }
@@ -89,19 +90,50 @@ namespace StaticHtml
             }
         }
 
-        /// <summary>
-        /// 容许缓存并且转发的各个客户的http头
-        /// </summary>
-        HashSet<string> alowHeader = new HashSet<string>() { "Content-Type", "Vary" };
+
 
         /// <summary>
         /// 输出Http流
         /// </summary>
         /// <param name="rep"></param>
         /// <param name="info"></param>
-        private void OutResponse(HttpResponse rep, HttpInfo info)
+        private void OutResponse(HttpRequest req, HttpResponse rep, HttpInfo info)
         {
-            rep.AppendHeader("Content-Encoding", "gzip");
+            Stream _out = AcceptGzip(req, rep, info);
+            OutHeaders(rep, info);
+            OutBody(rep, _out);
+        }
+
+        /// <summary>
+        /// 输出http响应body
+        /// </summary>
+        /// <param name="rep"></param>
+        /// <param name="_out"></param>
+        private static void OutBody(HttpResponse rep, Stream _out)
+        {
+            var buff = new byte[2048];
+            var len = 0;
+            using (_out)
+            {
+                while ((len = _out.Read(buff, 0, 2048)) != 0)
+                {
+                    rep.OutputStream.Write(buff, 0, len);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 容许缓存并且转发的各个客户的http头
+        /// </summary>
+        HashSet<string> alowHeader = new HashSet<string>() { "Content-Type", "Vary", "Etag", "Location", "Charset" };
+
+        /// <summary>
+        /// 输出http响应header
+        /// </summary>
+        /// <param name="rep"></param>
+        /// <param name="info"></param>
+        private void OutHeaders(HttpResponse rep, HttpInfo info)
+        {
             foreach (var item in info.Headers)
             {
                 if (alowHeader.Contains(item.Name))
@@ -109,15 +141,29 @@ namespace StaticHtml
                     rep.AppendHeader(item.Name, item.Value.TrimEnd());
                 }
             }
-            var buff = new byte[2048];
-            var len = 0;
-            using (info.Content)
+        }
+
+        /// <summary>
+        /// 根据请求头自动判断客户端是否支持gzip，如果不支持， 在服务器解压
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="rep"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        private static Stream AcceptGzip(HttpRequest req, HttpResponse rep, HttpInfo info)
+        {
+            var acceptEncoding = req.Headers.Get("Accept-Encoding");
+            Stream _out;
+            if (acceptEncoding != null && acceptEncoding.Contains("gzip"))
             {
-                while ((len = info.Content.Read(buff, 0, 2048)) != 0)
-                {
-                    rep.OutputStream.Write(buff, 0, len);
-                }
+                _out = info.Content;
+                rep.AppendHeader("Content-Encoding", "gzip");
             }
+            else
+            {
+                _out = new GZipStream(info.Content, CompressionMode.Decompress);
+            }
+            return _out;
         }
 
 
@@ -145,7 +191,7 @@ namespace StaticHtml
                 int headEndPosition = 0;
                 httpInfo.Headers = HttpParseHelp.ParseHeader(_stream, ref headEndPosition);
                 httpInfo.Content = _stream;
-                OutResponse(rep, httpInfo);
+                OutResponse(req, rep, httpInfo);
                 LogHelp.Info("cache hit html " + req.RawUrl);
             }
             context.ApplicationInstance.CompleteRequest();
@@ -173,7 +219,7 @@ namespace StaticHtml
                         Store.Save(key, html);
                         DateTime lastModifyed = info != null ? info.StoreTime : Store.Query(key).StoreTime;
                         rep.AppendHeader("Last-Modified", lastModifyed.ToString("r"));
-                        OutResponse(rep, httpInfo);
+                        OutResponse(req, rep, httpInfo);
                         context.ApplicationInstance.CompleteRequest();
                         LogHelp.Info("genHtml response success " + req.RawUrl);
                     }

@@ -69,13 +69,22 @@ namespace StaticHtml
             }
         }
 
+        private static object sync = new object();
+
         private static HtmlStaticCore instance;
 
         public static HtmlStaticCore GetInstance(StaticHtmlSection config)
         {
             if (instance == null)
             {
-                instance = new HtmlStaticCore(config);
+                lock (sync)
+                {
+                    if (instance == null)
+                    {
+                        instance = new HtmlStaticCore(config);
+                    }
+                }
+
             }
             return instance;
         }
