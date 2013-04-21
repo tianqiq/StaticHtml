@@ -60,7 +60,7 @@ namespace StaticHtml
             }
             _out.Write(CONNECTION_CLOSE);
             _out.Write("\r\n");
-            _out.Write("\r\n");
+            //_out.Write("\r\n");
             _out.Flush();
         }
 
