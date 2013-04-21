@@ -12,6 +12,10 @@ namespace StaticHtml
     /// </summary>
     public class StaticHtmlSection : ConfigurationSection
     {
+        public StaticHtmlSection() {
+            LogHelp.Info("config reader");
+        } 
+
         [ConfigurationProperty("", IsDefaultCollection = true)]
         public RuleElementCollection Rules
         {

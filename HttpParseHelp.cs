@@ -200,6 +200,7 @@ namespace StaticHtml
             {
                 _in.Write(buff, 0, len);
             }
+            _in.Flush();
         }
     }
 }

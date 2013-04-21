@@ -19,11 +19,14 @@ namespace StaticHtml
 
         const String CONNECTION_CLOSE = "Connection: close\r\n";
         const String HEADERFORMAT = "{0}: {1}\r\n";
+        const int TIMEOUT=6000;
+
 
         public Stream GenHTML(HttpRequest req)
         {
             using (var client = new TcpClient())
             {
+                client.ReceiveTimeout = TIMEOUT;
                 client.Connect(req.Url.Host, req.Url.Port);
                 using (var stream = client.GetStream())
                 {
@@ -43,7 +46,7 @@ namespace StaticHtml
         private void OutHeader(HttpRequest req, Stream _stream)
         {
             var _out = new StreamWriter(_stream);
-            _out.Write(String.Format("{0} {1} {2}\r\n", req.HttpMethod, req.RawUrl, req.ServerVariables["SERVER_PROTOCOL"]));
+            _out.Write(String.Format("{0} {1} {2}\r\n", req.HttpMethod, req.RawUrl, req.ServerVariables["SERVER_PROTOCOL"]));//req.ServerVariables["SERVER_PROTOCOL"]
             _out.Write(String.Format(HEADERFORMAT, "HOST", req.Url.Authority));
             _out.Write(String.Format(HEADERFORMAT, HtmlStaticCore.SKIPMARKHEAD, 1));
             foreach (String key in req.Headers.Keys)
@@ -56,6 +59,7 @@ namespace StaticHtml
                 }
             }
             _out.Write(CONNECTION_CLOSE);
+            _out.Write("\r\n");
             _out.Write("\r\n");
             _out.Flush();
         }
