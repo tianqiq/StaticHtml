@@ -47,7 +47,12 @@ namespace StaticHtml
         {
             var _out = new StreamWriter(_stream);
             _out.Write(String.Format("GET {0} HTTP/1.1 \r\n", req.Path));
-            _out.Write(String.Format(HEADERFORMAT, "HOST", req.Host));
+            var host = req.Host;
+            if (req.Port != 80)
+            {
+                host += ":" + req.Port;
+            }
+            _out.Write(String.Format(HEADERFORMAT, "HOST", host));
             _out.Write(String.Format(HEADERFORMAT, HtmlStaticCore.SKIPMARKHEAD, 1));
             foreach (String key in req.Headers.Keys)
             {
