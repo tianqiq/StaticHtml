@@ -15,6 +15,6 @@ namespace StaticHtml
         /// </summary>
         /// <param name="req">HttpRequest请求</param>
         /// <returns>Html内容</returns>
-        Stream GenHTML(HttpRequest req);
+        Stream GenHTML(RequestInfo req);
     }
 }

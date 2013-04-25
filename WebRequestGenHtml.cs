@@ -19,15 +19,15 @@ namespace StaticHtml
 
         const String CONNECTION_CLOSE = "Connection: close\r\n";
         const String HEADERFORMAT = "{0}: {1}\r\n";
-        const int TIMEOUT=6000;
+        const int TIMEOUT = 6000;
 
 
-        public Stream GenHTML(HttpRequest req)
+        public Stream GenHTML(RequestInfo req)
         {
             using (var client = new TcpClient())
             {
                 client.ReceiveTimeout = TIMEOUT;
-                client.Connect(req.Url.Host, req.Url.Port);
+                client.Connect(req.Host, req.Port);
                 using (var stream = client.GetStream())
                 {
                     OutHeader(req, stream);
@@ -37,17 +37,17 @@ namespace StaticHtml
 
         }
 
-        
+
         /// <summary>
         /// 发送所有请求头到服务器
         /// </summary>
         /// <param name="req"></param>
         /// <param name="_stream"></param>
-        private void OutHeader(HttpRequest req, Stream _stream)
+        private void OutHeader(RequestInfo req, Stream _stream)
         {
             var _out = new StreamWriter(_stream);
-            _out.Write(String.Format("{0} {1} {2}\r\n", req.HttpMethod, req.RawUrl, req.ServerVariables["SERVER_PROTOCOL"]));//req.ServerVariables["SERVER_PROTOCOL"]
-            _out.Write(String.Format(HEADERFORMAT, "HOST", req.Url.Authority));
+            _out.Write(String.Format("GET {0} HTTP/1.1 \r\n", req.Path));
+            _out.Write(String.Format(HEADERFORMAT, "HOST", req.Host));
             _out.Write(String.Format(HEADERFORMAT, HtmlStaticCore.SKIPMARKHEAD, 1));
             foreach (String key in req.Headers.Keys)
             {
@@ -60,29 +60,36 @@ namespace StaticHtml
             }
             _out.Write(CONNECTION_CLOSE);
             _out.Write("\r\n");
-            //_out.Write("\r\n");
             _out.Flush();
+            _stream.Flush();
         }
 
-        /* asp.net bug。当cookie value里面有逗号会出错
-        public string GenHTML(HttpRequest req)
+        /* 
+        public Stream GenHTML(HttpRequest req)
         {
             var url = req.Url.ToString();
             var request = (HttpWebRequest)WebRequest.Create(url);
             request.Headers.Add(HtmlStaticCore.SKIPMARKHEAD, "1");
             request.CookieContainer = new CookieContainer();
+            request.Timeout = 1000;
             for (var i = 0; i < req.Cookies.Count; i++)
             {
                 System.Web.HttpCookie item = req.Cookies[i];
                 var cookie = new Cookie(item.Name, item.Value, item.Path);
                 cookie.Expires = item.Expires;
-                request.CookieContainer.Add(req.Url,cookie);
+                request.CookieContainer.Add(req.Url, cookie);
             }
             using (StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream()))
             {
-                return reader.ReadToEnd();
+                string str = reader.ReadToEnd();
+                var stream = new MemoryStream();
+                var buff = System.Text.UTF8Encoding.UTF8.GetBytes(str.ToString());
+                stream.Write(buff, 0, buff.Length);
+                stream.Position = 0;
+                return stream;
             }
-        }*/
+        }
+        asp.net bug。当cookie value里面有逗号会出错*/
 
         #endregion
     }

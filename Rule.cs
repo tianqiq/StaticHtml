@@ -82,7 +82,9 @@ namespace StaticHtml
             }
             if (req.RawUrl.Contains(REFRESH) || req.Headers[REFRESHHEADER] == "1" || Expire.IsExpire(req, info))
             {
-                GenHtmlAndSave(context, key, info);
+                var reqInfo = ToRequestInfo(req);
+                reqInfo.Key = key;
+                System.Threading.ThreadPool.QueueUserWorkItem(ThreadStart, reqInfo);
             }
             else
             {
@@ -90,6 +92,23 @@ namespace StaticHtml
             }
         }
 
+
+        /// <summary>
+        /// 供线程线程调用方法
+        /// </summary>
+        /// <param name="arg"></param>
+        private void ThreadStart(Object arg)
+        {
+            var req = arg as RequestInfo;
+            try
+            {
+                GenHtmlAndSave(req);
+            }
+            catch (Exception e)
+            {
+                LogHelp.Warn("getHtml error " + e);
+            }
+        }
 
 
         /// <summary>
@@ -198,34 +217,41 @@ namespace StaticHtml
         }
 
         /// <summary>
-        /// 生成缓存保存，并输出
+        /// 将HttpRequest转换为RequestInfo
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private RequestInfo ToRequestInfo(HttpRequest request)
+        {
+            var info = new RequestInfo();
+            info.Path = request.RawUrl;
+            info.Host = request.Url.Host;
+            info.Port = request.Url.Port;
+            info.Headers = request.Headers;
+            return info;
+        }
+
+        /// <summary>
+        /// 生成缓存并保存
         /// </summary>
         /// <param name="context"></param>
         /// <param name="key"></param>
         /// <param name="info"></param>
-        private void GenHtmlAndSave(HttpContext context, string key, CacheInfo info)
+        private void GenHtmlAndSave(RequestInfo info)
         {
-            var req = context.Request;
-            var rep = context.Response;
-            if (!GlobalGenHtmlState.Contains(key))
+            if (!GlobalGenHtmlState.Contains(info.Key))
             {
                 try
                 {
-                    GlobalGenHtmlState.Add(key);
-                    var html = GenHTML.GenHTML(req);
+                    GlobalGenHtmlState.Add(info.Key);
+                    var html = GenHTML.GenHTML(info);
                     if (html != null)
                     {
-                        var httpInfo = HttpParseHelp.Parse(html);
-                        Store.Save(key, html);
-                        DateTime lastModifyed = info != null ? info.StoreTime : Store.Query(key).StoreTime;
-                        rep.AppendHeader("Last-Modified", lastModifyed.ToString("r"));
-                        OutResponse(req, rep, httpInfo);
-                        context.ApplicationInstance.CompleteRequest();
-                        LogHelp.Info("genHtml response success " + req.RawUrl);
+                        Store.Save(info.Key, html);
                     }
                     else
                     {
-                        LogHelp.Info("getHtml is null " + req.RawUrl);
+                        LogHelp.Warn("getHtml is null " + info.Path);
                     }
                 }
                 catch (Exception e)
@@ -234,7 +260,7 @@ namespace StaticHtml
                 }
                 finally
                 {
-                    GlobalGenHtmlState.Remove(key);
+                    GlobalGenHtmlState.Remove(info.Key);
                 }
             }
         }

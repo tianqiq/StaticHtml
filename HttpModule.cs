@@ -52,9 +52,6 @@ namespace StaticHtml
                 LogHelp.Warn("request process error " + httpApplication.Request.RawUrl + " " + ex.ToString());
             }
         }
-
-
-
         #endregion
     }
 }
