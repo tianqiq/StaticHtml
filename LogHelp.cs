@@ -14,14 +14,16 @@ namespace StaticHtml
 
         static LogHelp()
         {
-            Trace.Listeners.Add(new TextWriterTraceListener(HttpRuntime.AppDomainAppPath + "staticHtml_log.txt"));
+            var lister = new TextWriterTraceListener(HttpRuntime.AppDomainAppPath + "staticHtml_log.txt");
+            lister.TraceOutputOptions = TraceOptions.DateTime;
+            Trace.Listeners.Add(lister);
             Trace.AutoFlush = true;
             ts = new TraceSwitch("staticHtml", "staticHtml 日志开关", "2");
         }
 
         public static void Write(string message)
         {
-            Trace.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId + DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ": " + message);
+            Trace.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ": " + message);
         }
 
         public static void Info(string message)

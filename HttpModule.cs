@@ -27,9 +27,16 @@ namespace StaticHtml
         {
             try
             {
-                core = HtmlStaticCore.GetInstance(htmlSection);
-                context.BeginRequest += new EventHandler(context_BeginRequest);
-                LogHelp.Write("int success! ");
+                if (htmlSection.Run == "on")
+                {
+                    core = HtmlStaticCore.GetInstance(htmlSection);
+                    context.BeginRequest += new EventHandler(context_BeginRequest);
+                    LogHelp.Info("int success! ");
+                }
+                else
+                {
+                    LogHelp.Warn("run off! 请在staticHtml节点中添加属性run=\"on\" on:启用 off:关闭");
+                }
             }
             catch (Exception e)
             {

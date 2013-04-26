@@ -40,11 +40,7 @@ namespace StaticHtml
         public Boolean IsSkip(HttpRequest req)
         {
             //跳过非get请求
-            if (req.HttpMethod != System.Net.WebRequestMethods.Http.Get)
-            {
-                return false;
-            }
-            var skip = false;
+            var skip = req.HttpMethod != System.Net.WebRequestMethods.Http.Get;
             if (skipRegex != null)
             {
                 skip = skipRegex.IsMatch(req.RawUrl);

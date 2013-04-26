@@ -12,9 +12,10 @@ namespace StaticHtml
     /// </summary>
     public class StaticHtmlSection : ConfigurationSection
     {
-        public StaticHtmlSection() {
-            LogHelp.Info("config reader");
-        } 
+        public StaticHtmlSection()
+        {
+
+        }
 
         [ConfigurationProperty("", IsDefaultCollection = true)]
         public RuleElementCollection Rules
@@ -29,6 +30,15 @@ namespace StaticHtml
         public String Skip
         {
             get { return base["skip"] as string; }
+        }
+
+        /// <summary>
+        /// 直接跳过，不进行静态化的Url，正则表达式
+        /// </summary>
+        [ConfigurationProperty("run")]
+        public String Run
+        {
+            get { return base["run"] as string; }
         }
     }
 
