@@ -18,7 +18,9 @@ namespace StaticHtml
         {
             var info = new HttpInfo();
             int position = 0;
-            info.Headers = ParseHeader(_out, ref position);
+            string firstLine = "";
+            info.Headers = ParseHeader(_out, ref position, ref firstLine);
+            info.FirstLine = firstLine;
             info.Content = ToMemStream(_out);
             return info;
         }
@@ -29,8 +31,9 @@ namespace StaticHtml
         /// <param name="_out"></param>
         /// <param name="headerEndPosition"></param>
         /// <returns></returns>
-        public static IList<HttpInfo.Header> ParseHeader(Stream _in, ref int headerEndPosition)
+        public static IList<HttpInfo.Header> ParseHeader(Stream _in, ref int headerEndPosition, ref string firstLine)
         {
+            var isfirstLine = true;
             var headers = new List<HttpInfo.Header>();
             var buff = new byte[4];
             int len = 4, totallen = 0, state = 1, i = 0;
@@ -45,6 +48,11 @@ namespace StaticHtml
                     state = HeaderState(buff[i], len, state);
                     if (state == 3)
                     {
+                        if (isfirstLine)//如果是第一行
+                        {
+                            firstLine = Encoding.Default.GetString(memStream.ToArray(), 0, totallen - len + i + 1);
+                            isfirstLine = false;
+                        }
                         var header = ToHeader(memStream, totallen - len + i + 1);
                         if (header != null)
                         {

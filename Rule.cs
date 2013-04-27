@@ -130,11 +130,11 @@ namespace StaticHtml
         /// <param name="_out"></param>
         private static void OutBody(HttpResponse rep, Stream _out)
         {
-            var buff = new byte[2048];
+            var buff = new byte[2048 * 2];
             var len = 0;
             using (_out)
             {
-                while ((len = _out.Read(buff, 0, 2048)) != 0)
+                while ((len = _out.Read(buff, 0, 2048 * 2)) != 0)
                 {
                     rep.OutputStream.Write(buff, 0, len);
                 }
@@ -197,7 +197,6 @@ namespace StaticHtml
             var req = context.Request;
             var rep = context.Response;
             string time = info.StoreTime.ToString("r");
-            rep.AppendHeader("Last-Modified", time);
             if (req.Headers["If-Modified-Since"] == time)
             {
                 rep.StatusCode = (int)System.Net.HttpStatusCode.NotModified;
@@ -208,12 +207,36 @@ namespace StaticHtml
                 var httpInfo = new HttpInfo();
                 var _stream = Store.Get(key);
                 int headEndPosition = 0;
-                httpInfo.Headers = HttpParseHelp.ParseHeader(_stream, ref headEndPosition);
+                string firstLine = "";
+                httpInfo.Headers = HttpParseHelp.ParseHeader(_stream, ref headEndPosition, ref firstLine);
+                rep.StatusCode = ParseRespondCode(firstLine);
+                if (rep.StatusCode == 200)
+                {
+                    rep.AppendHeader("Last-Modified", time);
+                }
                 httpInfo.Content = _stream;
                 OutResponse(req, rep, httpInfo);
                 LogHelp.Info("cache hit html " + req.RawUrl);
             }
             context.ApplicationInstance.CompleteRequest();
+        }
+
+
+        Regex regCode = new Regex(@"\d{3}", RegexOptions.Compiled);
+        /// <summary>
+        /// 分析出Http响应状态码
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns></returns>
+        private int ParseRespondCode(string line)
+        {
+            int code = 200;
+            var result = regCode.Match(line);
+            if (result.Success)
+            {
+                Int32.TryParse(result.Value, out code);
+            }
+            return code;
         }
 
         /// <summary>
@@ -230,6 +253,8 @@ namespace StaticHtml
             info.Headers = request.Headers;
             return info;
         }
+
+
 
         /// <summary>
         /// 生成缓存并保存

@@ -12,6 +12,11 @@ namespace StaticHtml
     public class HttpInfo
     {
         /// <summary>
+        /// Http响应流第一行
+        /// </summary>
+        public String FirstLine { get; set; }
+
+        /// <summary>
         /// 头集合
         /// </summary>
         public IList<Header> Headers { get; set; }

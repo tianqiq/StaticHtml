@@ -83,7 +83,8 @@ namespace StaticHtml
             using (var write = File.Create(GetPath(key)))
             {
                 var stream = repInfo as MemoryStream;
-                write.Write(stream.ToArray(), 0, (int)stream.Length);
+                stream.WriteTo(write);
+                //write.Write(stream.ToArray(), 0, (int)stream.Length);
             }
         }
 
