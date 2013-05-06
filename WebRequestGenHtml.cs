@@ -46,7 +46,7 @@ namespace StaticHtml
         private void OutHeader(RequestInfo req, Stream _stream)
         {
             var _out = new StreamWriter(_stream);
-            _out.Write(String.Format("GET {0} HTTP/1.1 \r\n", req.Path));
+            _out.Write(String.Format("GET {0} HTTP/1.0 \r\n", req.Path));
             var host = req.Host;
             if (req.Port != 80)
             {

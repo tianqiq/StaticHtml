@@ -82,6 +82,7 @@
     <Compile Include="LogHelp.cs" />
     <Compile Include="MemStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RefererUrlRegexPatten.cs" />
     <Compile Include="RegexPatten.cs" />
     <Compile Include="HttpInfo.cs" />
     <Compile Include="RequestInfo.cs" />

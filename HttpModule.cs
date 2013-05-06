@@ -15,11 +15,6 @@ namespace StaticHtml
     {
         #region IHttpModule 成员
 
-        public void Dispose()
-        {
-
-        }
-
         private readonly static StaticHtmlSection htmlSection = System.Configuration.ConfigurationManager.GetSection("staticHtml") as StaticHtmlSection;
 
         HtmlStaticCore core;
@@ -60,5 +55,10 @@ namespace StaticHtml
             }
         }
         #endregion
+
+        public void Dispose()
+        {
+            
+        }
     }
 }
