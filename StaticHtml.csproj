@@ -88,6 +88,7 @@
     <Compile Include="RequestInfo.cs" />
     <Compile Include="Rule.cs" />
     <Compile Include="ServerExecuteGenHtml.cs" />
+    <Compile Include="SqlDateExpire.cs" />
     <Compile Include="TimeExpire.cs" />
     <Compile Include="UrlMd5GenKey.cs" />
     <Compile Include="WebRequestGenHtml.cs" />

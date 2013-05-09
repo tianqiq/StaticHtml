@@ -19,7 +19,7 @@ namespace StaticHtml
 
         const String CONNECTION_CLOSE = "Connection: close\r\n";
         const String HEADERFORMAT = "{0}: {1}\r\n";
-        const int TIMEOUT = 6000;
+        const int TIMEOUT = 10000;
 
 
         public Stream GenHTML(RequestInfo req)

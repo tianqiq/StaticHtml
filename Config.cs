@@ -186,10 +186,10 @@ namespace StaticHtml
             var pars = new Dictionary<string, string>();
             foreach (var item in parsSplit)
             {
-                var temp = item.Split('=');
-                if (temp.Length == 2)
+                var index = item.IndexOf('=');
+                if (index > 0)
                 {
-                    pars.Add(temp[0], temp[1]);
+                    pars.Add(item.Substring(0, index), item.Substring(index + 1));
                 }
             }
             return pars;

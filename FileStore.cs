@@ -84,7 +84,6 @@ namespace StaticHtml
             {
                 var stream = repInfo as MemoryStream;
                 stream.WriteTo(write);
-                //write.Write(stream.ToArray(), 0, (int)stream.Length);
             }
         }
 
