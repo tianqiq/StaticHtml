@@ -1,17 +1,17 @@
   StaticHtml 
   是一个简单，易扩展，高效的asp.net 静态html生成组建, 由纯asp.net编写，可以在不改变网站任何
   源代码的情况下，为网站添加html静态缓存。 只需要在web.config配置即可。 兼容urlrewrite的网站
-  怎么使用？ 请下载 StaticHtml使用教程.docx 里面有详细介绍。
+  怎么使用？
   
 
   系统主要有一下几个接口
-  IPatten 判断请求是否要生成html缓存 ，主要方法：bool IsPatten(HttpRequest request)；
+  IPatten 判断请求是否要生成html缓存 ，主要方法：bool IsPatten(HttpRequest request)
   IGenKey 将当前请求生成一个唯一key，主要方法：String GenKey(HttpRequest request)
-  IExpire 判断是否过期， 主要方法bool IsExpire(HttpRequest req, HtmlInfo info);
-  IStore html存储容器,主要方法:void Save(String key,string html); 保存html内容，
-    String Get(String key);获取html， HtmlInfo Query(String key);查询Html缓存信息
+  IExpire 判断是否过期， 主要方法bool IsExpire(HttpRequest req, CacheInfo info)
+  IStore html存储容器,主要方法:void Save(string key, Stream repInfo); 保存html内容
+  String Get(String key);获取html， Stream Get(String key);查询Html缓存信息
  
   如果您阅读源码可以HttpModule -》 HtmlStaticCore 这么一个入口， 其实整个源码是非常简单的。
-  可以参看这里： http://www.cnblogs.com/tianqiq/archive/2013/03/31/2992267.html
+  可以参看这里： http://www.cnblogs.com/tianqiq
   作者：tianqiq	
   邮件: tianqiq@gmail.com(有任何问题，发送到这个邮件)
