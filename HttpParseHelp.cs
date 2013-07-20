@@ -181,7 +181,10 @@ namespace StaticHtml
                         memStream.Position = 0;
                         if (!new StreamReader(memStream).ReadToEnd().Contains(GZIPHEAD))
                         {
-                            CopyTo(_out, new GZipStream(memStream, CompressionMode.Compress));
+                            using(var gzip = new GZipStream(memStream, CompressionMode.Compress))
+                            {
+                                CopyTo(_out, gzip);
+                            }
                         }
                         else
                         {
@@ -191,8 +194,9 @@ namespace StaticHtml
                 }
                 len = 5 - state;
             }
-            memStream.Position = 0;
-            return memStream;
+            var retMemStream = new MemoryStream(memStream.ToArray());
+            retMemStream.Position = 0;
+            return retMemStream;
         }
 
         /// <summary>
