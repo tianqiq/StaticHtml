@@ -12,7 +12,7 @@ namespace StaticHtml
         /// 存储Html
         /// </summary>
         /// <param name="key">HttpRequest生成的key</param>
-        /// <param name="html">内容</param>
+        /// <param name="repInfo">内容</param>
         void Save(String key, Stream repInfo);
        
         /// <summary>
