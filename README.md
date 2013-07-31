@@ -55,8 +55,9 @@ staticHtml是asp.net平台的一个开源，高效，易扩展的网页静态化
 这4个问题，您都可以自定义的回答，只需要简单的继承系统里面的接口，配置上去就可以
 
 * 您需要缓存什么样的页面
+
 ```csharp
-	public interface IPatten
+public interface IPatten
     {
         /// <summary>
         /// 将HttpRequest判断是否匹配Rule规则
@@ -66,6 +67,7 @@ staticHtml是asp.net平台的一个开源，高效，易扩展的网页静态化
         bool IsPatten(HttpRequest request);
     }
 ```
+
 * 您缓存的东西存在哪里
 ```csharp
 	/// <summary>
