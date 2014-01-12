@@ -97,6 +97,7 @@ public interface IPatten
         CacheInfo Query(String key);
     }
 ```
+
 *  你采用一个什么样的缓存过期策略
 ```csharp
   	/// <summary>
@@ -113,6 +114,7 @@ public interface IPatten
         bool IsExpire(HttpRequest req, CacheInfo info);
     }
 ```
+
 * 您通过什么样的方式，将你缓存的页面，生成一个系统唯一的key
 ```csharp
 	/// <summary>
@@ -128,6 +130,7 @@ public interface IPatten
         String GenKey(HttpRequest request);
     }
 ```
+
 大家可以查看[源码]里面上面的配置文件的配置项，即可查看系统是如何实现这些接口的。
 
 ## 其他
