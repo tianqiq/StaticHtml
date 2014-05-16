@@ -37,7 +37,7 @@ staticHtml是asp.net平台的一个开源，高效，易扩展的网页静态化
 		<patten type="StaticHtml.RegexPatten,StaticHtml" pars="RegPatten=Content/"/>
 		<store type="StaticHtml.FileStore,StaticHtml" pars="Path=cacheHtml_Content/"/>
 		<expire type="StaticHtml.TimeExpire,StaticHtml" pars="Second=180"/>
-		<genkey type="StaticHtml.UrlMd5GenKey,StaticHtml"/>
+		<genKey type="StaticHtml.UrlMd5GenKey,StaticHtml"/>
 	</rule>
 </staticHtml>
 ```
