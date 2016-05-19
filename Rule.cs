@@ -247,7 +247,7 @@ namespace StaticHtml
         private RequestInfo ToRequestInfo(HttpRequest request)
         {
             var info = new RequestInfo();
-            info.Path = request.RawUrl;
+            info.Path = request.Url.AbsolutePath;
             info.Host = request.Url.Host;
             info.Port = request.Url.Port;
             info.Headers = request.Headers;
